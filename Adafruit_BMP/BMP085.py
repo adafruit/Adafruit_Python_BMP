@@ -21,8 +21,6 @@
 import logging
 import time
 
-import Adafruit_GPIO.I2C as I2C
-
 
 # BMP085 default address.
 BMP085_I2CADDR           = 0x77
@@ -55,15 +53,17 @@ BMP085_READPRESSURECMD   = 0x34
 
 
 class BMP085(object):
-	def __init__(self, mode=BMP085_STANDARD, address=BMP085_I2CADDR, 
-							 busnum=I2C.get_default_bus()):
+	def __init__(self, mode=BMP085_STANDARD, address=BMP085_I2CADDR, i2c=None, **kwargs):
 		self._logger = logging.getLogger('Adafruit_BMP.BMP085')
 		# Check that mode is valid.
 		if mode not in [BMP085_ULTRALOWPOWER, BMP085_STANDARD, BMP085_HIGHRES, BMP085_ULTRAHIGHRES]:
 			raise ValueError('Unexpected mode value {0}.  Set mode to one of BMP085_ULTRALOWPOWER, BMP085_STANDARD, BMP085_HIGHRES, or BMP085_ULTRAHIGHRES'.format(mode))
 		self._mode = mode
 		# Create I2C device.
-		self._device = I2C.Device(address, busnum)
+		if i2c is None:
+			import Adafruit_GPIO.I2C as I2C
+			i2c = I2C
+		self._device = i2c.get_i2c_device(address, **kwargs)
 		# Load calibration values.
 		self._load_calibration()
 
