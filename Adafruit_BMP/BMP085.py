@@ -18,6 +18,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from __future__ import division
 import logging
 import time
 
@@ -139,7 +140,7 @@ class BMP085(object):
 		#UT = 27898
 		# Calculations below are taken straight from section 3.5 of the datasheet.
 		X1 = ((UT - self.cal_AC6) * self.cal_AC5) >> 15
-		X2 = (self.cal_MC << 11) / (X1 + self.cal_MD)
+		X2 = (self.cal_MC << 11) // (X1 + self.cal_MD)
 		B5 = X1 + X2
 		temp = ((B5 + 8) >> 4) / 10.0
 		self._logger.debug('Calibrated temperature {0} C'.format(temp))
@@ -155,7 +156,7 @@ class BMP085(object):
 		# Calculations below are taken straight from section 3.5 of the datasheet.
 		# Calculate true temperature coefficient B5.
 		X1 = ((UT - self.cal_AC6) * self.cal_AC5) >> 15
-		X2 = (self.cal_MC << 11) / (X1 + self.cal_MD)
+		X2 = (self.cal_MC << 11) // (X1 + self.cal_MD)
 		B5 = X1 + X2
 		self._logger.debug('B5 = {0}'.format(B5))
 		# Pressure Calculations
@@ -164,7 +165,7 @@ class BMP085(object):
 		X1 = (self.cal_B2 * (B6 * B6) >> 12) >> 11
 		X2 = (self.cal_AC2 * B6) >> 11
 		X3 = X1 + X2
-		B3 = (((self.cal_AC1 * 4 + X3) << self._mode) + 2) / 4
+		B3 = (((self.cal_AC1 * 4 + X3) << self._mode) + 2) // 4
 		self._logger.debug('B3 = {0}'.format(B3))
 		X1 = (self.cal_AC3 * B6) >> 13
 		X2 = (self.cal_B1 * ((B6 * B6) >> 12)) >> 16
@@ -174,9 +175,9 @@ class BMP085(object):
 		B7 = (UP - B3) * (50000 >> self._mode)
 		self._logger.debug('B7 = {0}'.format(B7))
 		if B7 < 0x80000000:
-			p = (B7 * 2) / B4
+			p = (B7 * 2) // B4
 		else:
-			p = (B7 / B4) * 2
+			p = (B7 // B4) * 2
 		X1 = (p >> 8) * (p >> 8)
 		X1 = (X1 * 3038) >> 16
 		X2 = (-7357 * p) >> 16
