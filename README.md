@@ -1,4 +1,4 @@
-Adafruit Python BMP
+DEPRECATED LIBRARY Adafruit Python BMP
 ===================
 
 This library has been deprecated!
